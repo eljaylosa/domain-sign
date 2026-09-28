@@ -50,7 +50,7 @@ const DOMAIN_VIDEOS = {
 // PERSON POSITIONING
 // =========================
 
-const PERSON_SCALE = .75;
+const PERSON_SCALE = 0.75;
 const PERSON_OFFSET_X = 0;
 const PERSON_OFFSET_Y = 0;
 
@@ -84,6 +84,8 @@ async function startCamera() {
 /* =========================
    MAIN LOOP
 ========================= */
+let lastProcessTime = 0;
+const PROCESS_INTERVAL = 50; // 20 FPS
 
 async function predictWebcam() {
   if (!handLandmarker || !imageSegmenter) {
@@ -95,6 +97,15 @@ async function predictWebcam() {
     requestAnimationFrame(predictWebcam);
     return;
   }
+
+  const now = performance.now();
+
+  if (now - lastProcessTime < PROCESS_INTERVAL) {
+    requestAnimationFrame(predictWebcam);
+    return;
+  }
+
+  lastProcessTime = now;
 
   const timestamp = performance.now();
 
@@ -108,7 +119,6 @@ async function predictWebcam() {
 
   requestAnimationFrame(predictWebcam);
 }
-
 /* =========================
    HAND LANDMARKS
 ========================= */
@@ -507,37 +517,13 @@ function isSukunaSign(hands) {
 ========================= */
 
 function isCancelSign(landmarks) {
-  const indexAngle = getFingerAngle(
-    landmarks,
-    5,
-    6,
-    7,
-    8
-  );
+  const indexAngle = getFingerAngle(landmarks, 5, 6, 7, 8);
 
-  const middleAngle = getFingerAngle(
-    landmarks,
-    9,
-    10,
-    11,
-    12
-  );
+  const middleAngle = getFingerAngle(landmarks, 9, 10, 11, 12);
 
-  const ringAngle = getFingerAngle(
-    landmarks,
-    13,
-    14,
-    15,
-    16
-  );
+  const ringAngle = getFingerAngle(landmarks, 13, 14, 15, 16);
 
-  const pinkyAngle = getFingerAngle(
-    landmarks,
-    17,
-    18,
-    19,
-    20
-  );
+  const pinkyAngle = getFingerAngle(landmarks, 17, 18, 19, 20);
 
   // Open palm
   return (
@@ -567,31 +553,22 @@ function handleCancelGesture(cancelDetected) {
       CANCEL_REQUIRED_FRAMES
     );
 
-    if (
-      cancelFrames >=
-      CANCEL_REQUIRED_FRAMES
-    ) {
+    if (cancelFrames >= CANCEL_REQUIRED_FRAMES) {
       if (!cancelConfirmed) {
         cancelConfirmed = true;
 
-        gestureStatus.textContent =
-          "DOMAIN CANCELLED ✓";
+        gestureStatus.textContent = "DOMAIN CANCELLED ✓";
 
-        console.log(
-          "🖐️ DOMAIN CANCELLED"
-        );
+        console.log("🖐️ DOMAIN CANCELLED");
 
         cancelDomain();
       }
     } else {
       const progress = Math.round(
-        (cancelFrames /
-          CANCEL_REQUIRED_FRAMES) *
-          100
+        (cancelFrames / CANCEL_REQUIRED_FRAMES) * 100
       );
 
-      gestureStatus.textContent =
-        `Canceling Domain... ${progress}%`;
+      gestureStatus.textContent = `Canceling Domain... ${progress}%`;
     }
   } else {
     cancelFrames = 0;
@@ -671,9 +648,7 @@ function cancelDomain() {
   domainVideo.currentTime = 0;
 
   // Hide domain
-  domainOverlay.classList.remove(
-    "active"
-  );
+  domainOverlay.classList.remove("active");
 
   // Reset everything after fade
   setTimeout(() => {
@@ -688,8 +663,7 @@ function cancelDomain() {
     cancelFrames = 0;
     cancelConfirmed = false;
 
-    gestureStatus.textContent =
-      "Gesture: Not detected";
+    gestureStatus.textContent = "Gesture: Not detected";
   }, 500);
 }
 
