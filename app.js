@@ -87,6 +87,10 @@ async function startCamera() {
 let lastProcessTime = 0;
 const PROCESS_INTERVAL = 50; // 20 FPS
 
+let latestHandResults = {
+  landmarks: [],
+};
+
 async function predictWebcam() {
   if (!handLandmarker || !imageSegmenter) {
     requestAnimationFrame(predictWebcam);
@@ -100,42 +104,29 @@ async function predictWebcam() {
 
   const now = performance.now();
 
-  if (now - lastProcessTime < PROCESS_INTERVAL) {
-    requestAnimationFrame(predictWebcam);
-    return;
+  // Run AI hand detection only every 50ms (~20 FPS)
+  if (now - lastProcessTime >= PROCESS_INTERVAL) {
+    lastProcessTime = now;
+
+    const timestamp = performance.now();
+
+    latestHandResults = handLandmarker.detectForVideo(camera, timestamp);
+
+    handleHandGestures(latestHandResults);
+
+    if (domainActive) {
+      updateDomainComposite(timestamp);
+    }
   }
 
-  lastProcessTime = now;
-
-  const timestamp = performance.now();
-
-  const handResults = handLandmarker.detectForVideo(camera, timestamp);
-
-  drawLandmarks(handResults);
-
-  if (domainActive) {
-    updateDomainComposite(timestamp);
-  }
+  // Draw landmarks every animation frame
+  drawLandmarks(latestHandResults);
 
   requestAnimationFrame(predictWebcam);
 }
-/* =========================
-   HAND LANDMARKS
-========================= */
 
-function drawLandmarks(results) {
-  const ctx = output.getContext("2d");
-
-  output.width = camera.videoWidth;
-  output.height = camera.videoHeight;
-
-  ctx.clearRect(0, 0, output.width, output.height);
-
+function handleHandGestures(results) {
   const hands = results.landmarks || [];
-
-  // =====================================
-  // NO HANDS
-  // =====================================
 
   if (hands.length === 0) {
     gestureFrames = 0;
@@ -151,65 +142,65 @@ function drawLandmarks(results) {
     return;
   }
 
-  // =====================================
-  // DOMAIN ACTIVE
-  // ONLY CHECK CANCEL
-  // =====================================
-
+  // Domain is currently active → only check CANCEL
   if (domainActive) {
-    // Cancel only needs ONE hand
-    if (hands.length >= 1) {
-      const cancelDetected = isCancelSign(hands[0]);
-
-      handleCancelGesture(cancelDetected);
-    }
+    const cancelDetected = isCancelSign(hands[0]);
+    handleCancelGesture(cancelDetected);
+    return;
   }
 
-  // =====================================
-  // DOMAIN NOT ACTIVE
-  // CHECK GOJO / SUKUNA
-  // =====================================
-  else {
-    // ---------------------------------
-    // TWO HANDS = SUKUNA
-    // ---------------------------------
+  // Two hands → only check SUKUNA
+  if (hands.length >= 2) {
+    gestureFrames = 0;
+    gestureConfirmed = false;
 
-    if (hands.length >= 2) {
-      gestureFrames = 0;
-      gestureConfirmed = false;
+    const sukunaDetected = isSukunaSign(hands);
+    handleSukunaGesture(sukunaDetected);
 
-      const sukunaDetected = isSukunaSign(hands);
-
-      handleSukunaGesture(sukunaDetected);
-    }
-
-    // ---------------------------------
-    // ONE HAND = GOJO
-    // ---------------------------------
-    else if (hands.length === 1) {
-      sukunaFrames = 0;
-      sukunaConfirmed = false;
-
-      const gojoDetected = isGojoSign(hands[0]);
-
-      handleGojoGesture(gojoDetected);
-    }
+    return;
   }
 
-  // =====================================
-  // DRAW HAND LANDMARKS
-  // =====================================
+  // One hand → only check GOJO
+  if (hands.length === 1) {
+    sukunaFrames = 0;
+    sukunaConfirmed = false;
+
+    const gojoDetected = isGojoSign(hands[0]);
+    handleGojoGesture(gojoDetected);
+  }
+}
+
+/* =========================
+   HAND LANDMARKS
+========================= */
+
+function drawLandmarks(results) {
+  const ctx = output.getContext("2d");
+
+  // Only resize the canvas when the camera dimensions actually change.
+  if (
+    output.width !== camera.videoWidth ||
+    output.height !== camera.videoHeight
+  ) {
+    output.width = camera.videoWidth;
+    output.height = camera.videoHeight;
+  }
+
+  ctx.clearRect(0, 0, output.width, output.height);
+
+  const hands = results.landmarks || [];
+
+  if (hands.length === 0) {
+    return;
+  }
 
   for (const landmarks of hands) {
     for (const point of landmarks) {
       const x = point.x * output.width;
-
       const y = point.y * output.height;
 
       ctx.beginPath();
-
       ctx.arc(x, y, 5, 0, Math.PI * 2);
-
       ctx.fill();
     }
 
