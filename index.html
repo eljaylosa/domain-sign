@@ -3,18 +3,16 @@
   <head>
     <meta charset="UTF-8" />
 
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1.0"
-    />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
     <title>Domain Sign</title>
+
+    <link rel="icon" type="image/png" href="assets/favicon.jpg" />
 
     <link rel="stylesheet" href="style.css" />
   </head>
 
   <body>
-
     <!-- =========================
          HEADER
     ========================== -->
@@ -24,153 +22,87 @@
 
       <h1>DOMAIN SIGN</h1>
 
-      <p class="subtitle">
-        Perform the hand sign to activate your domain.
-      </p>
+      <p class="subtitle">Perform the hand sign to activate your domain.</p>
     </header>
-
 
     <!-- =========================
          MAIN APP
     ========================== -->
 
     <main class="app">
-
       <!-- CAMERA -->
 
       <section class="camera-section">
-
         <div class="camera-container">
-
-          <video
-            id="camera"
-            autoplay
-            playsinline
-          ></video>
+          <video id="camera" autoplay playsinline></video>
 
           <canvas id="output"></canvas>
-
         </div>
-
       </section>
-
 
       <!-- STATUS -->
 
       <section class="status-panel">
-
         <div class="status-item">
+          <span class="status-label"> CAMERA </span>
 
-          <span class="status-label">
-            CAMERA
-          </span>
-
-          <span
-            id="status"
-            class="status-value"
-          >
-            Camera is not started.
-          </span>
-
+          <span id="status" class="status-value"> Camera is not started. </span>
         </div>
 
-
         <div class="status-item">
+          <span class="status-label"> GESTURE </span>
 
-          <span class="status-label">
-            GESTURE
-          </span>
-
-          <span
-            id="gestureStatus"
-            class="status-value"
-          >
+          <span id="gestureStatus" class="status-value">
             Gesture: Not detected
           </span>
-
         </div>
-
       </section>
-
 
       <!-- START BUTTON -->
 
-      <button
-        id="startCamera"
-        class="start-button"
-      >
-        START CAMERA
-      </button>
-
+      <button id="startCamera" class="start-button">START CAMERA</button>
 
       <!-- FUTURE DOMAIN INFO -->
 
       <section class="technique-info">
-
         <div class="technique">
-
-          <span class="technique-symbol">
-            ◈
-          </span>
+          <span class="technique-symbol"> ◈ </span>
 
           <div>
             <strong>GOJO</strong>
             <span>Unlimited Void</span>
           </div>
-
         </div>
 
-
         <div class="technique">
-
-          <span class="technique-symbol">
-            ◈
-          </span>
+          <span class="technique-symbol"> ◈ </span>
 
           <div>
             <strong>SUKUNA</strong>
             <span>Malevolent Shrine</span>
           </div>
-
         </div>
 
-
         <div class="technique">
-
-          <span class="technique-symbol">
-            ◈
-          </span>
+          <span class="technique-symbol"> ◈ </span>
 
           <div>
             <strong>CANCEL</strong>
             <span>End Domain</span>
           </div>
-
         </div>
-
       </section>
-
     </main>
-
 
     <!-- =========================
          DOMAIN OVERLAY
     ========================== -->
 
     <div id="domainOverlay">
+      <video id="domainVideo" playsinline preload="auto"></video>
 
-      <video
-        id="domainVideo"
-        playsinline
-        preload="auto"
-      ></video>
-
-      <canvas
-        id="domainComposite"
-      ></canvas>
-
+      <canvas id="domainComposite"></canvas>
     </div>
-
 
     <!-- =========================
          ACTIVATION FLASH
@@ -178,11 +110,6 @@
 
     <div id="domainFlash"></div>
 
-
-    <script
-      type="module"
-      src="app.js"
-    ></script>
-
+    <script type="module" src="app.js"></script>
   </body>
 </html>
