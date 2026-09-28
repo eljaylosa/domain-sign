@@ -19,6 +19,10 @@ const domainFlash = document.getElementById("domainFlash");
 
 const compositeCtx = domainComposite.getContext("2d");
 
+let maskCanvas = null;
+let maskCtx = null;
+let maskImage = null;
+
 let handLandmarker;
 let imageSegmenter;
 
@@ -673,9 +677,13 @@ function updateDomainComposite(timestamp) {
     return;
   }
 
-  domainComposite.width = window.innerWidth;
+  const width = window.innerWidth;
+  const height = window.innerHeight;
 
-  domainComposite.height = window.innerHeight;
+  if (domainComposite.width !== width || domainComposite.height !== height) {
+    domainComposite.width = width;
+    domainComposite.height = height;
+  }
 
   const result = imageSegmenter.segmentForVideo(camera, timestamp);
 
@@ -696,47 +704,49 @@ function drawPersonWithMask(mask) {
 
   const maskData = mask.getAsUint8Array();
 
-  // Create temporary mask canvas
-  const maskCanvas = document.createElement("canvas");
+  // Create the mask canvas only once
+  if (
+    !maskCanvas ||
+    maskCanvas.width !== maskWidth ||
+    maskCanvas.height !== maskHeight
+  ) {
+    maskCanvas = document.createElement("canvas");
 
-  maskCanvas.width = maskWidth;
-  maskCanvas.height = maskHeight;
+    maskCanvas.width = maskWidth;
+    maskCanvas.height = maskHeight;
 
-  const maskCtx = maskCanvas.getContext("2d");
+    maskCtx = maskCanvas.getContext("2d", {
+      willReadFrequently: false,
+    });
 
-  const maskImage = maskCtx.createImageData(maskWidth, maskHeight);
+    maskImage = maskCtx.createImageData(maskWidth, maskHeight);
+  }
+
+  // Reuse the existing ImageData
+  const pixels = maskImage.data;
 
   for (let i = 0; i < maskData.length; i++) {
-    const value = maskData[i];
     const index = i * 4;
 
-    // Person = 0
-    if (value === 0) {
-      maskImage.data[index] = 255;
-      maskImage.data[index + 1] = 255;
-      maskImage.data[index + 2] = 255;
-      maskImage.data[index + 3] = 255;
+    if (maskData[i] === 0) {
+      pixels[index] = 255;
+      pixels[index + 1] = 255;
+      pixels[index + 2] = 255;
+      pixels[index + 3] = 255;
     } else {
-      maskImage.data[index] = 0;
-      maskImage.data[index + 1] = 0;
-      maskImage.data[index + 2] = 0;
-      maskImage.data[index + 3] = 0;
+      pixels[index] = 0;
+      pixels[index + 1] = 0;
+      pixels[index + 2] = 0;
+      pixels[index + 3] = 0;
     }
   }
 
   maskCtx.putImageData(maskImage, 0, 0);
 
-  // Clear previous frame
-  compositeCtx.clearRect(0, 0, domainComposite.width, domainComposite.height);
-
-  compositeCtx.globalCompositeOperation = "source-over";
-
   const canvasWidth = domainComposite.width;
-
   const canvasHeight = domainComposite.height;
 
   const cameraWidth = camera.videoWidth;
-
   const cameraHeight = camera.videoHeight;
 
   const scale =
@@ -744,17 +754,20 @@ function drawPersonWithMask(mask) {
     PERSON_SCALE;
 
   const drawWidth = cameraWidth * scale;
-
   const drawHeight = cameraHeight * scale;
 
   const offsetX = (canvasWidth - drawWidth) / 2 + PERSON_OFFSET_X;
 
   const offsetY = (canvasHeight - drawHeight) / 2 + PERSON_OFFSET_Y;
 
+  compositeCtx.clearRect(0, 0, canvasWidth, canvasHeight);
+
   // Draw camera
+  compositeCtx.globalCompositeOperation = "source-over";
+
   compositeCtx.drawImage(camera, offsetX, offsetY, drawWidth, drawHeight);
 
-  // Keep only person
+  // Keep only the detected person
   compositeCtx.globalCompositeOperation = "destination-in";
 
   compositeCtx.drawImage(maskCanvas, offsetX, offsetY, drawWidth, drawHeight);
