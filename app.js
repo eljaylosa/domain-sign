@@ -87,6 +87,9 @@ async function startCamera() {
 let lastProcessTime = 0;
 const PROCESS_INTERVAL = 50; // 20 FPS
 
+let lastSegmentationTime = 0;
+const SEGMENTATION_INTERVAL = 125; // ~8 FPS
+
 let latestHandResults = {
   landmarks: [],
 };
@@ -104,7 +107,7 @@ async function predictWebcam() {
 
   const now = performance.now();
 
-  // Run AI hand detection only every 50ms (~20 FPS)
+  // Hand detection ~20 FPS
   if (now - lastProcessTime >= PROCESS_INTERVAL) {
     lastProcessTime = now;
 
@@ -113,13 +116,16 @@ async function predictWebcam() {
     latestHandResults = handLandmarker.detectForVideo(camera, timestamp);
 
     handleHandGestures(latestHandResults);
-
-    if (domainActive) {
-      updateDomainComposite(timestamp);
-    }
   }
 
-  // Draw landmarks every animation frame
+  // Person segmentation ~8 FPS
+  if (domainActive && now - lastSegmentationTime >= SEGMENTATION_INTERVAL) {
+    lastSegmentationTime = now;
+
+    updateDomainComposite(now);
+  }
+
+  // Render landmarks every frame
   drawLandmarks(latestHandResults);
 
   requestAnimationFrame(predictWebcam);
