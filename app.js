@@ -50,7 +50,7 @@ const DOMAIN_VIDEOS = {
 // PERSON POSITIONING
 // =========================
 
-const PERSON_SCALE = 0.75;
+const PERSON_SCALE = 1;
 const PERSON_OFFSET_X = 0;
 const PERSON_OFFSET_Y = 0;
 
