@@ -1,0 +1,491 @@
+/* =========================
+   GLOBAL
+========================= */
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+
+  background:
+    radial-gradient(
+      circle at 50% 0%,
+      #241b38 0%,
+      #0c0b10 45%,
+      #050507 100%
+    );
+
+  color: #f5f5f5;
+
+  font-family:
+    Arial,
+    Helvetica,
+    sans-serif;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  overflow-x: hidden;
+}
+
+
+/* =========================
+   HEADER
+========================= */
+
+.app-header {
+  text-align: center;
+
+  padding: 45px 20px 25px;
+
+  width: 100%;
+}
+
+.eyebrow {
+  margin: 0 0 8px;
+
+  font-size: 11px;
+
+  letter-spacing: 4px;
+
+  color: #9b8cb8;
+
+  font-weight: bold;
+}
+
+.app-header h1 {
+  margin: 0;
+
+  font-size: clamp(38px, 7vw, 64px);
+
+  letter-spacing: 8px;
+
+  font-weight: 900;
+
+  text-shadow:
+    0 0 15px rgba(255, 255, 255, 0.15);
+}
+
+.subtitle {
+  margin: 12px 0 0;
+
+  color: #88838f;
+
+  font-size: 14px;
+}
+
+
+/* =========================
+   MAIN APP
+========================= */
+
+.app {
+  width: min(900px, 94vw);
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  padding-bottom: 50px;
+}
+
+
+/* =========================
+   CAMERA
+========================= */
+
+.camera-section {
+  width: 100%;
+
+  display: flex;
+  justify-content: center;
+}
+
+.camera-container {
+  position: relative;
+
+  width: min(720px, 100%);
+
+  aspect-ratio: 4 / 3;
+
+  background: #08080b;
+
+  border: 1px solid #37313f;
+
+  border-radius: 18px;
+
+  overflow: hidden;
+
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.02),
+    0 20px 60px rgba(0, 0, 0, 0.55);
+}
+
+#camera {
+  width: 100%;
+  height: 100%;
+
+  display: block;
+
+  object-fit: cover;
+}
+
+#output {
+  position: absolute;
+
+  inset: 0;
+
+  width: 100%;
+  height: 100%;
+
+  pointer-events: none;
+}
+
+
+/* =========================
+   CAMERA CORNERS
+========================= */
+
+.camera-container::before,
+.camera-container::after {
+  content: "";
+
+  position: absolute;
+
+  width: 35px;
+  height: 35px;
+
+  z-index: 5;
+
+  pointer-events: none;
+}
+
+.camera-container::before {
+  top: 14px;
+  left: 14px;
+
+  border-top: 2px solid rgba(255, 255, 255, 0.6);
+  border-left: 2px solid rgba(255, 255, 255, 0.6);
+}
+
+.camera-container::after {
+  right: 14px;
+  bottom: 14px;
+
+  border-right: 2px solid rgba(255, 255, 255, 0.6);
+  border-bottom: 2px solid rgba(255, 255, 255, 0.6);
+}
+
+
+/* =========================
+   STATUS PANEL
+========================= */
+
+.status-panel {
+  width: min(720px, 100%);
+
+  margin-top: 18px;
+
+  display: grid;
+
+  grid-template-columns: 1fr 1fr;
+
+  gap: 10px;
+}
+
+.status-item {
+  background: rgba(255, 255, 255, 0.035);
+
+  border: 1px solid #29252e;
+
+  border-radius: 10px;
+
+  padding: 14px 16px;
+
+  display: flex;
+  flex-direction: column;
+
+  gap: 5px;
+}
+
+.status-label {
+  font-size: 9px;
+
+  letter-spacing: 2px;
+
+  color: #77717f;
+
+  font-weight: bold;
+}
+
+.status-value {
+  font-size: 13px;
+
+  color: #ddd8e2;
+}
+
+
+/* =========================
+   START BUTTON
+========================= */
+
+.start-button {
+  margin-top: 18px;
+
+  padding: 14px 32px;
+
+  border: 1px solid #81718f;
+
+  border-radius: 8px;
+
+  background: #17131d;
+
+  color: white;
+
+  font-size: 12px;
+
+  font-weight: bold;
+
+  letter-spacing: 2px;
+
+  cursor: pointer;
+
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.start-button:hover {
+  background: #241c2c;
+
+  border-color: #b9a8c8;
+
+  box-shadow:
+    0 0 25px rgba(160, 130, 190, 0.18);
+
+  transform: translateY(-1px);
+}
+
+.start-button:active {
+  transform: translateY(1px);
+}
+
+
+/* =========================
+   TECHNIQUE INFO
+========================= */
+
+.technique-info {
+  width: min(720px, 100%);
+
+  margin-top: 18px;
+
+  display: grid;
+
+  grid-template-columns:
+    repeat(3, 1fr);
+
+  gap: 10px;
+}
+
+.technique {
+  min-height: 70px;
+
+  padding: 13px;
+
+  border-radius: 10px;
+
+  border: 1px solid #242129;
+
+  background: rgba(255, 255, 255, 0.025);
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 10px;
+}
+
+.technique-symbol {
+  width: 30px;
+  height: 30px;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  border: 1px solid #51475b;
+
+  border-radius: 50%;
+
+  color: #b7a8c2;
+
+  font-size: 12px;
+}
+
+.technique strong {
+  display: block;
+
+  font-size: 11px;
+
+  letter-spacing: 1px;
+}
+
+.technique span:last-child {
+  display: block;
+
+  margin-top: 3px;
+
+  font-size: 10px;
+
+  color: #77717d;
+}
+
+
+/* =========================
+   DOMAIN OVERLAY
+========================= */
+
+#domainOverlay {
+  position: fixed;
+
+  inset: 0;
+
+  background: black;
+
+  opacity: 0;
+  visibility: hidden;
+
+  transition:
+    opacity 0.5s ease,
+    visibility 0.5s ease;
+
+  z-index: 100;
+}
+
+#domainOverlay.active {
+  opacity: 1;
+
+  visibility: visible;
+}
+
+
+/* =========================
+   DOMAIN VIDEO
+========================= */
+
+#domainVideo {
+  position: absolute;
+
+  inset: 0;
+
+  width: 100%;
+  height: 100%;
+
+  object-fit: cover;
+
+  z-index: 1;
+}
+
+
+/* =========================
+   USER COMPOSITE
+========================= */
+
+#domainComposite {
+  position: absolute;
+
+  inset: 0;
+
+  width: 100%;
+  height: 100%;
+
+  z-index: 2;
+
+  pointer-events: none;
+}
+
+
+/* =========================
+   DOMAIN FLASH
+========================= */
+
+#domainFlash {
+  position: fixed;
+
+  inset: 0;
+
+  background: white;
+
+  opacity: 0;
+
+  pointer-events: none;
+
+  z-index: 200;
+}
+
+#domainFlash.active {
+  animation:
+    domainFlash 0.7s ease-out;
+}
+
+@keyframes domainFlash {
+  0% {
+    opacity: 0;
+  }
+
+  15% {
+    opacity: 1;
+  }
+
+  35% {
+    opacity: 0.8;
+  }
+
+  100% {
+    opacity: 0;
+  }
+}
+
+
+/* =========================
+   MOBILE
+========================= */
+
+@media (max-width: 650px) {
+
+  .app-header {
+    padding-top: 30px;
+  }
+
+  .app-header h1 {
+    letter-spacing: 5px;
+  }
+
+  .subtitle {
+    font-size: 12px;
+  }
+
+  .camera-container {
+    border-radius: 12px;
+  }
+
+  .status-panel {
+    grid-template-columns: 1fr;
+  }
+
+  .technique-info {
+    grid-template-columns: 1fr;
+  }
+
+  .technique {
+    min-height: 60px;
+  }
+}
