@@ -32,7 +32,7 @@ let sukunaConfirmed = false;
 let cancelFrames = 0;
 let cancelConfirmed = false;
 
-const REQUIRED_FRAMES = 10;
+const REQUIRED_FRAMES = 5;
 const CANCEL_REQUIRED_FRAMES = 6;
 
 let domainActive = false;
